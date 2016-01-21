@@ -1,0 +1,142 @@
+@import 'reset';
+
+$primary-font-stack: 'Source Sans Pro', sans-serif;
+
+
+body {
+	font: 16px/1.5em $primary-font-stack;
+}
+
+
+.carousel {
+	margin: 1em;
+	border: 1px solid #ccc;
+}
+.carousel-thumbs {
+	background: #f0f0f0;
+	padding: 1em;
+	position: relative;
+	margin-bottom: 1.5em;
+	overflow: hidden;
+}
+.carousel-thumbs img {
+	width: 75px;
+	height: auto;
+}
+.carousel-thumbs ul {
+	list-style: none !important;
+	margin: 0 !important;
+	position: relative;
+	-webkit-transition: ease 250ms;
+	-moz-transition: ease 250ms;
+	transition: ease 250ms;
+	left: 0;
+}
+.carousel-thumbs ul li {
+	float: left;
+	margin: 0 0.5em;
+}
+.carousel-thumbs ul li:first-child {
+	margin-left: 0;
+}
+.carousel-thumbs ul li a {
+	padding: 4px;
+	display: inline-block;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background: #fff;
+	border-bottom-color: #aaa;
+	position: relative;
+	-webkit-transition: ease 0.25s;
+	-moz-transition: ease 0.25s;
+	transition: ease 0.25s;
+}
+.carousel-thumbs ul li a:hover {
+	background: #BBDDEB;
+}
+.carousel-thumbs ul li a.current, .carousel-thumbs ul li a.current:hover {
+	background: #FDD42D;
+}
+
+.carousel-thumbs::before {
+	content: "";
+	border-bottom: 10px solid #fff;
+	width: 0px;
+	position: absolute;
+	left: 50%;
+	bottom: -1px;
+	border-left: 15px solid transparent;
+	border-right: 15px solid transparent;
+	z-index: 10;
+	cursor: none;
+	margin-left: -15px;
+}
+.carousel-thumbs-inner {
+	width: 10000px; /*super huge*/
+}
+.carousel-content {
+	position: relative;
+	overflow: hidden;
+	margin-bottom: 1.5em;
+}
+.carousel-content-inner {
+	width: 300%;
+	position: relative;
+	left: -100%;
+}
+.carousel-content-text {
+	width: 33.3333%;
+	padding: 1em;
+	float: left;
+	left: 0;
+	position: relative;
+	height: 1px;
+}
+.carousel-content-text.anim-left {
+	left: -33.3333%;
+	transition: 250ms ease;
+}
+.carousel-content-text.anim-right {
+	left: 33.3333%;
+	-webkit-transition: 250ms ease;
+	-moz-transition: 250ms ease;
+	transition: 250ms ease;
+}
+.carousel-content-text.current,
+.carousel-content-text.anim-left,
+.carousel-content-text.anim-right {
+	height: auto;
+}
+
+
+.carousel-nav {
+	clear: both;
+	border-top: 1px solid #ccc;
+}
+.carousel-nav li.nav-left {
+	float: left;
+	width: 50%;
+}
+.carousel-nav li.nav-right {
+	float: right;
+	width: 50%;
+    border-left: 1px solid #ccc;
+}
+.carousel-nav li a {
+	padding: 1rem;
+	display: block;
+	text-align: center;
+	background: #f0f0f0;
+	text-decoration: none;
+	color: #666;
+}
+.carousel-nav li a:hover {
+	background: #BBDDEB;
+}
+.carousel-nav li a.disabled, 
+.carousel-nav li a.disabled:hover {
+	border:	1px solid #aaa;
+	color: #aaa !important;
+	background: none;
+	cursor: default;
+}
