@@ -1,7 +1,11 @@
-var carousel = {
-	stories: [],
+function carousel(container, contentFile) {
+	
+	// Find content JSON
+	$.getJSON(contentFile, function(data) {
+		this.content = data;
+	});
 
-	init: function() {
+	this.init = function() {
 		$('.success-icons a').click(function(){
 			if ($('.success-carousel').hasClass('animating')) return false;
 			var currentIndex = $('.success-icons a.current').data('storykey');
@@ -10,25 +14,25 @@ var carousel = {
 			var newIndex = $(this).data('storykey');
 			var direction = currentIndex < newIndex ? "right" : "left";
 
-			carousel.goToStory(newIndex, direction);
-			carousel.centerIcon();
+			this.goToStory(newIndex, direction);
+			this.centerIcon();
 		});
-		$('.success-carousel .nav-right').click(function(){carousel.advanceStory('next')});
-		$('.success-carousel .nav-left').click(function(){carousel.advanceStory('prev')});
+		$('.success-carousel .nav-right').click(function(){this.advanceStory('next')});
+		$('.success-carousel .nav-left').click(function(){this.advanceStory('prev')});
 		$('.success-icons').swipe({
-			swipeLeft: function(){carousel.advanceStory('next')}, 
-			swipeRight: function(){carousel.advanceStory('prev')}, 
+			swipeLeft: function(){this.advanceStory('next')}, 
+			swipeRight: function(){this.advanceStory('prev')}, 
 			excludedElements: "button, input, select, textarea, .noSwipe"
 		});
-		$(window).resize(carousel.centerIcon);
-		carousel.centerIcon();
-	},
+		$(window).resize(this.centerIcon);
+		this.centerIcon();
+	}
 
-	goToStory: function(key, direction) {
+	this.goToStory = function(key, direction) {
 		if ($('.success-carousel').hasClass('animating')) return false;
 		$('.success-carousel').addClass('animating');
 
-		var storyhtml = carousel.constructStory(carousel.stories[key]);
+		var storyhtml = this.constructStory(this.stories[key]);
 		if (direction == "left") {
 			// 1. See if staged div has the content loaded
 			$('.success-content-text.stage-left').html(storyhtml);
@@ -64,9 +68,9 @@ var carousel = {
 				$('.success-carousel').removeClass('animating');
 			}, 250);
 		}
-	},
+	}
 
-	constructStory: function (storydata) {
+	this.constructStory = function(storydata) {
 		var html = "";
 		html += '<div id="story" class="success-story">';
 		if (storydata.format != 'video') {
@@ -83,9 +87,9 @@ var carousel = {
 		}
 		html += storydata.content;
 		return html;
-	},
+	}
 
-	centerIcon: function () {
+	this.centerIcon = function() {
 		// width of container
 		var container_width = $('.success-icons').width();
 		var center = container_width/2;
@@ -95,9 +99,9 @@ var carousel = {
 		var icon_width = $('.success-icons a.current').parent('li').width();
 		// reposition parent ul
 		$('.success-icons ul').css('left', center-offset-(icon_width/2));
-	},
+	}
 
-	advanceStory: function (direction) {
+	this.advanceStory = function(direction) {
 		if (direction == 'next') {
 			var nextIcon = $('.success-icons a.current').parent('li').next().find('a');
 			if (nextIcon.length > 0) nextIcon.click();

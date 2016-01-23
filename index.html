@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<div class="carousel">
+<div class="carousel" id="carousel">
 	<div class="carousel-thumbs">
 		<div class="carousel-thumbs-inner">
 			<ul class="clearfix">
@@ -48,5 +48,8 @@
 <script type="text/javascript" src="node_modules/jquery/dist/jquery.min.js"></script>
 <script type="text/javascript" src="node_modules/jquery-touchswipe/jquery.touchSwipe.min.js"></script>
 <script type="text/javascript" src="js/carousel.js"></script>
+<script>
+var carousel1 = new carousel($('#carousel'), 'js/content.json');
+</script>
 </body>
 </html>
