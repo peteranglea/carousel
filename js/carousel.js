@@ -1,120 +1,146 @@
 function carousel(container, contentFile) {
-	
+	this.container = $(container);
+
 	// Find content JSON
+	var obj = this;
 	$.getJSON(contentFile, function(data) {
-		this.content = data;
+		if (data.length > 0) {
+			obj.data = data;
+			obj.init();
+		} else {
+			console.log('No data retrieved.');
+		}
 	});
 
+	// Initialize object, generate markup, assign interactions, etc.
 	this.init = function() {
-		$('.success-icons a').click(function(){
-			if ($('.success-carousel').hasClass('animating')) return false;
-			var currentIndex = $('.success-icons a.current').data('storykey');
-			$('.success-icons a.current').removeClass('current');
+		// Generate markup from object data
+		var markup = "";
+		// Make thumbnail row
+		markup += '<div class="carousel-thumbs">' + 
+			'<div class="carousel-thumbs-inner">' + 
+				'<ul class="clearfix">';
+		for (var i = 0; i < this.data.length; i++) {
+			var current = i == 0 ? ' class="current"' : '';
+			markup += '<li><a href="javascript:;" data-itemkey="' + i + '"' + current + '><img src="' + this.data[i].thumbnail + '" /></a></li>';
+		}
+		markup += '</ul>' +
+			'</div>' +
+		'</div>';
+
+		// Make content area
+		markup += '<div class="carousel-content">' +
+			'<div class="carousel-content-inner">' +
+				'<div class="carousel-content-text stage-left"></div>' +
+				'<div class="carousel-content-text current">' + this.data[0].content + '</div>' +
+				'<div class="carousel-content-text stage-right"></div>' +
+			'</div>' +
+		'</div>';
+
+		// Make nav
+		markup += '<div class="carousel-nav">' +
+			'<ul class="clearfix">' +
+				'<li class="nav-left">' +
+					'<a href="javascript:;">&larr; Previous</a>' +
+				'</li>' +
+				'<li class="nav-right">' +
+					'<a href="javascript:;">Next &rarr;</a>' +
+				'</li>' +
+			'</ul>' +
+		'</div>';
+
+		this.container.html(markup);
+
+		// Assign interactivity
+		this.container.find('.carousel-thumbs a').click(function(){
+			if (obj.container.hasClass('animating')) return false;
+			var currentIndex = obj.container.find('.carousel-thumbs a.current').data('itemkey');
+			obj.container.find('.carousel-thumbs a.current').removeClass('current');
 			$(this).addClass('current');
-			var newIndex = $(this).data('storykey');
+			var newIndex = $(this).data('itemkey');
 			var direction = currentIndex < newIndex ? "right" : "left";
 
-			this.goToStory(newIndex, direction);
-			this.centerIcon();
+			obj.goToStory(newIndex, direction);
+			obj.centerIcon();
 		});
-		$('.success-carousel .nav-right').click(function(){this.advanceStory('next')});
-		$('.success-carousel .nav-left').click(function(){this.advanceStory('prev')});
-		$('.success-icons').swipe({
-			swipeLeft: function(){this.advanceStory('next')}, 
-			swipeRight: function(){this.advanceStory('prev')}, 
+		this.container.find('.nav-right').click(function(){obj.advanceStory('next')});
+		this.container.find('.nav-left').click(function(){obj.advanceStory('prev')});
+		this.container.find('.carousel-thumbs').swipe({
+			swipeLeft: function(){obj.advanceStory('next')}, 
+			swipeRight: function(){obj.advanceStory('prev')}, 
 			excludedElements: "button, input, select, textarea, .noSwipe"
 		});
-		$(window).resize(this.centerIcon);
+		$(window).resize(function(){obj.centerIcon()});
 		this.centerIcon();
 	}
 
 	this.goToStory = function(key, direction) {
-		if ($('.success-carousel').hasClass('animating')) return false;
-		$('.success-carousel').addClass('animating');
+		if (this.container.hasClass('animating')) return false;
+		this.container.addClass('animating');
 
-		var storyhtml = this.constructStory(this.stories[key]);
 		if (direction == "left") {
 			// 1. See if staged div has the content loaded
-			$('.success-content-text.stage-left').html(storyhtml);
+			this.container.find('.carousel-content-text.stage-left').html(this.data[key].content);
 			// 2. Animate center and left divs
-			$('.success-content-text.current, .success-content-text.stage-left').addClass('anim-right');
+			this.container.find('.carousel-content-text.current, .carousel-content-text.stage-left').addClass('anim-right');
 			window.setTimeout(function(){
 				// 3. Remove stage-right, rename others
-				var oldhtml = $('.success-content-text.stage-right').html();
-				$('.success-content-text.stage-right').remove();
-				$('.success-content-text.current').removeClass('current').removeClass('anim-right').addClass('stage-right');
-				$('.success-content-text.stage-left').removeClass('stage-left').removeClass('anim-right').addClass('current');
+				obj.container.find('.carousel-content-text.stage-right').remove();
+				obj.container.find('.carousel-content-text.current').removeClass('current').removeClass('anim-right').addClass('stage-right');
+				obj.container.find('.carousel-content-text.stage-left').removeClass('stage-left').removeClass('anim-right').addClass('current');
 				// 4. Re-add stage-left
-				var srdiv = $('<div/>').addClass('success-content-text stage-left')//.html(oldhtml);
-				srdiv.prependTo('.success-content-inner');
+				var newdiv = $('<div/>').addClass('carousel-content-text stage-left');
+				var dest = obj.container.find('.carousel-content-inner');
+				newdiv.prependTo(dest);
 
-				$('.success-carousel').removeClass('animating');
+				obj.container.removeClass('animating');
 			}, 250);
 		} else {
 			// 1. See if staged div has the content loaded
-			$('.success-content-text.stage-right').html(storyhtml);
+			this.container.find('.carousel-content-text.stage-right').html(this.data[key].content);
 			// 2. Animate center and right divs
-			$('.success-content-text.current, .success-content-text.stage-right').addClass('anim-left');
+			this.container.find('.carousel-content-text.current, .carousel-content-text.stage-right').addClass('anim-left');
 			window.setTimeout(function(){
 				// 3. Remove stage-left, rename others
-				var oldhtml = $('.success-content-text.stage-left').html();
-				$('.success-content-text.stage-left').remove();
-				$('.success-content-text.current').removeClass('current').removeClass('anim-left').addClass('stage-left');
-				$('.success-content-text.stage-right').removeClass('stage-right').removeClass('anim-left').addClass('current');
+				obj.container.find('.carousel-content-text.stage-left').remove();
+				obj.container.find('.carousel-content-text.current').removeClass('current').removeClass('anim-left').addClass('stage-left');
+				obj.container.find('.carousel-content-text.stage-right').removeClass('stage-right').removeClass('anim-left').addClass('current');
 				// 4. Re-add stage-right
-				var srdiv = $('<div/>').addClass('success-content-text stage-right')//.html(oldhtml);
-				srdiv.appendTo('.success-content-inner');
+				var newdiv = $('<div/>').addClass('carousel-content-text stage-right');
+				var dest = obj.container.find('.carousel-content-inner');
+				newdiv.appendTo(dest);
 
-				$('.success-carousel').removeClass('animating');
+				obj.container.removeClass('animating');
 			}, 250);
 		}
-	}
-
-	this.constructStory = function(storydata) {
-		var html = "";
-		html += '<div id="story" class="success-story">';
-		if (storydata.format != 'video') {
-			html += '<figure class="success-content-image">';
-			html += storydata.image;
-			html += '<figcaption>' + storydata['image-caption'] + '</figcaption>';
-			html += '</figure>';
-		}
-		html += "<h3>" + storydata.title;
-		if (typeof storydata.meta['grad-year'] != "undefined") html += ", &rsquo;" + storydata.meta['grad-year'][0].substring(2);
-		html += "</h3>";
-		if (typeof storydata.meta['occupation'] != "undefined") {
-			html += "<h4>" + storydata.meta['occupation'][0] + "</h4>";
-		}
-		html += storydata.content;
-		return html;
 	}
 
 	this.centerIcon = function() {
 		// width of container
-		var container_width = $('.success-icons').width();
+		var container_width = this.container.find('.carousel-thumbs').width();
 		var center = container_width/2;
 		// distance of icon from left edge of icon row
-		var offset = $('.success-icons a.current').offset().left - $('.success-icons ul').offset().left;
+		var offset = this.container.find('.carousel-thumbs a.current').offset().left - this.container.find('.carousel-thumbs ul').offset().left;
 		// width of icon element
-		var icon_width = $('.success-icons a.current').parent('li').width();
+		var icon_width = this.container.find('.carousel-thumbs a.current').parent('li').width();
 		// reposition parent ul
-		$('.success-icons ul').css('left', center-offset-(icon_width/2));
+		this.container.find('.carousel-thumbs ul').css('left', center-offset-(icon_width/2));
 	}
 
 	this.advanceStory = function(direction) {
 		if (direction == 'next') {
-			var nextIcon = $('.success-icons a.current').parent('li').next().find('a');
+			var nextIcon = this.container.find('.carousel-thumbs a.current').parent('li').next().find('a');
 			if (nextIcon.length > 0) nextIcon.click();
-			else $('.success-icons li:first-child a').click();
+			else this.container.find('.carousel-thumbs li:first-child a').click();
 		} else if (direction == 'prev') {
-			var prevIcon = $('.success-icons a.current').parent('li').prev().find('a');
+			var prevIcon = this.container.find('.carousel-thumbs a.current').parent('li').prev().find('a');
 			if (prevIcon.length > 0) prevIcon.click();
-			else $('.success-icons li:last-child a').click();
+			else this.container.find('.carousel-thumbs li:last-child a').click();
 		}
 
 		// scroll up if necessary 
-		if ($('.success-carousel').offset().top < $(document).scrollTop()){
-			window.scrollTo(0, $('.success-carousel').offset().top);
+		if (this.container.offset().top < $(document).scrollTop()){
+			window.scrollTo(0, this.container.offset().top);
 		}
 	}
 }
