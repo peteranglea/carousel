@@ -1,5 +1,5 @@
 _site/
-.sass-cache/
+css/.sass-cache/
 .DS_store
 .*.swp
 node_modules/
